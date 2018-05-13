@@ -171,7 +171,8 @@ extension MasterViewController {
 		let cell = tableView.dequeueReusableCell(withIdentifier: TaskTableViewCell.cellIdentifierFromClassName(), for: indexPath) as! TaskTableViewCell
 		let task = taskForIndexPath(indexPath: indexPath as NSIndexPath)
 		cell.configureForTask(task: task)
-    
+    	cell.delegate = self
+		
     return cell
   }
 	
