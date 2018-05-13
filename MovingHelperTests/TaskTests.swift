@@ -18,7 +18,7 @@ class TaskTests: XCTestCase {
     super.setUp()
     
     UserDefaultKey.resetAll()
-    TaskSaver.nukeTaskFile(FileName.SavedTasks)
+	TaskSaver.nukeTaskFile(fileName: FileName.SavedTasks)
   }
   
   //MARK: - Private Helper Functions
@@ -30,14 +30,14 @@ class TaskTests: XCTestCase {
     done: Bool) {
       
       let testTaskDict = [
-        TaskJSONKey.Done.rawValue: NSNumber(bool: done),
+		TaskJSONKey.Done.rawValue: NSNumber(value: done),
         TaskJSONKey.Title.rawValue: title,
         TaskJSONKey.TaskID.rawValue: taskID,
         TaskJSONKey.Notes.rawValue: notes ?? NSNull(),
         TaskJSONKey.DueDate.rawValue: dueDate.rawValue
-      ] //as NSDictionary
+		] as [String : Any] //as NSDictionary
       
-      let taskFromJSON = Task(fromJSON: testTaskDict)
+	let taskFromJSON = Task(fromJSON: testTaskDict as NSDictionary)
       
       XCTAssertEqual(taskFromJSON.title, title, "Title didn't deserialize!")
       XCTAssertEqual(taskFromJSON.dueDate, dueDate, "Due date didn't deserialize!")
@@ -49,7 +49,7 @@ class TaskTests: XCTestCase {
           XCTFail("JSON did not have notes when there was a passed in notes value!")
         }
       } else {
-        if let jsonNotes = taskFromJSON.notes {
+        if let _ = taskFromJSON.notes {
           XCTFail("JSON had notes when task did not!")
         }
       }
@@ -60,13 +60,13 @@ class TaskTests: XCTestCase {
   //MARK: Actual Tests!
   
   func testTaskJSONDeserialization() {
-    checkDeserializationForTaskProperties("A test task",
+	checkDeserializationForTaskProperties(title: "A test task",
       dueDate: TaskDueDate.OneWeekAfter,
       taskID: 34,
       notes: "some notes",
       done: true)
     
-    checkDeserializationForTaskProperties("Another test task",
+	checkDeserializationForTaskProperties(title: "Another test task",
       dueDate: TaskDueDate.OneDayBefore,
       taskID: 3,
       notes: nil,
@@ -97,13 +97,14 @@ class TaskTests: XCTestCase {
     } else {
       XCTFail("Due date did not serialize!")
     }
-    
-    if let retrievedNotes: AnyObject = jsonDict[TaskJSONKey.Notes.rawValue] {
+	
+	// retrievedNotes
+    if let _ = jsonDict.object(forKey: TaskJSONKey.Notes.rawValue) {
       XCTFail("Unexpected value for unstored notes!")
     }
     
     if let retrievedTaskID = jsonDict[TaskJSONKey.TaskID.rawValue] as? NSNumber {
-      XCTAssertEqual(retrievedTaskID.integerValue, taskID, "Task ID value incorrect!")
+		XCTAssertEqual(retrievedTaskID.intValue, taskID, "Task ID value incorrect!")
     } else {
       XCTFail("Task ID did not serialize!")
     }
